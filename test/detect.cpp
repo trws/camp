@@ -71,8 +71,8 @@ static_assert(!CAMP_REQ(concepts::random_access_iterator, decltype(val<std::list
 static_assert(CAMP_REQ(concepts::random_access_iterator, int *), "int* is an iterator");
 static_assert(CAMP_REQ(concepts::random_access_iterator, decltype(val<std::vector<int>>().begin())), "int* is an iterator");
 
-static_assert(!CAMP_REQ(concepts::random_access_range, decltype(val<std::list<int>>())), "list iterator is not random access");
-static_assert(CAMP_REQ(concepts::random_access_range, decltype(val<std::vector<int>>())), "int* is an iterator");
+static_assert(!CAMP_REQ(concepts::random_access_range, decltype(val<std::list<int>>())), "list is not random access");
+static_assert(CAMP_REQ(concepts::random_access_range, decltype(val<std::vector<int>>())), "vector is random access");
 
 void bah (int, float);
 CAMP_CHECK_VALUE_NOT(camp::concepts::invokable<decltype(bah), int, char*>);
