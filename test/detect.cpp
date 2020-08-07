@@ -7,11 +7,61 @@
 #include <camp/list.hpp>
 #include <camp/type_traits/detect.hpp>
 #include <camp/concepts.hpp>
+#include <gtest/gtest.h>
 
 #include <list>
 #include <vector>
 
 using namespace camp;
+
+
+CAMP_DEF_REQUIREMENT_T( has_data_method, val<T>().data() );
+
+CAMP_DEF_CONCEPT_T( HasDataMethod, detect< has_data_method, T >() );
+
+template< typename T >
+class Base
+{
+public:
+  void data()
+  { return; }
+};
+
+template< typename T >
+class Derived : protected Base< T >
+{
+public:
+  using Base< T >::data;
+};
+
+template< bool B >
+struct BoolStruct
+{
+  static constexpr bool value = B;
+};
+
+TEST(foo, bar)
+{
+  static_assert( CheckConcept<Concept<has_data_method, std::string>>::value, "" );
+  static_assert( !CheckConcept<Concept<has_data_method, int>>::value, "" );
+
+  static_assert( CheckConcept<Concept<has_data_method, Base<int>>>::value, "" );
+
+  static_assert( !CheckConcept<Concept<has_data_method, Derived<int>>>::value, "derived" );
+#if !defined(__CUDACC__)
+  static_assert( CAMP_REQ( HasDataMethod, Derived< int > ), "" );
+#else
+  // This fails and the inverse does too!
+  // static_assert( CAMP_REQ( HasDataMethod, Derived< int > ), "" );
+  // static_assert( !CAMP_REQ( HasDataMethod, Derived< int > ), "" );
+#endif
+
+  ASSERT_EQ( CAMP_REQ( HasDataMethod, Derived< int > ), true );
+
+  // This fails with NVCC even though the above passed.
+  constexpr bool hasDataMethodAtCompileTime = BoolStruct< CAMP_REQ( HasDataMethod, Derived< int > ) >::value;
+  ASSERT_EQ( hasDataMethodAtCompileTime, true );
+}
 
 struct A {
 };

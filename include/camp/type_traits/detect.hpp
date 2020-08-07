@@ -12,6 +12,11 @@
 namespace camp
 {
 
+template <template <class... Ts> class Name, class ... Args>
+struct Concept {};
+
+template <class> struct CheckConcept;
+
 /// meta-type that always produces void
 template <class...>
 struct void_t {
@@ -96,6 +101,16 @@ constexpr bool detect_convertible()
   return is_detected_convertible<To, Op, Args...>::value;
 }
 
+// I really don't want to talk about this, but it's a clever way to
+// pack a concept name in a generic wrapper (to potentially take advantage of the
+// preprocessor to generate concept definitions). By packing it up, we
+// are then able to defer checking to the appropriate time
+template <template <template<class...> class, class...> class Concept,
+          template <class...> class Name,
+          class ... Args>
+struct CheckConcept<Concept<Name, Args...>> {
+  static constexpr bool value = ::camp::detect<Name, Args...>();
+};
 
 #define CAMP_DEF_DETECTOR(name, params, ...)                   \
   template <CAMP_UNQUOTE params, typename __Res = __VA_ARGS__> \
