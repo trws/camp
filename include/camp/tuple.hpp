@@ -215,6 +215,14 @@ public:
       camp::make_idx_seq_t<sizeof...(Elements)>>::type;
   using type = tuple;
 
+  constexpr tuple() = default;
+
+  constexpr tuple(tuple const& o) = default;
+  constexpr tuple(tuple&& o) = default;
+
+  tuple& operator=(tuple const& rhs) = default;
+  tuple& operator=(tuple&& rhs) = default;
+
 private:
   Base base;
 
@@ -235,7 +243,7 @@ private:
 public:
 
   CAMP_HOST_DEVICE constexpr explicit tuple(const Elements&... rest)
-      : base{rest...}
+      : base(rest...)
   {
   }
 
@@ -243,17 +251,21 @@ public:
             typename std::enable_if<
                 !is_pack_this_tuple<Args...>::value>::type* = nullptr>
   CAMP_HOST_DEVICE constexpr explicit tuple(Args&&... rest)
-      : base{std::forward<Args>(rest)...}
+      : base(std::forward<Args>(rest)...)
   {
   }
 
-  template <typename... RTypes>
+  template <typename... RTypes,
+            typename std::enable_if<
+                ::camp::concepts::metalib::all_of<::std::is_convertible<RTypes, Elements>::value...>::value>::type* = nullptr>
   CAMP_HOST_DEVICE constexpr explicit tuple(const tuple<RTypes...>& rhs)
       : base(internal::expand_tag{}, rhs)
   {
   }
 
-  template <typename... RTypes>
+  template <typename... RTypes,
+            typename std::enable_if<
+                ::camp::concepts::metalib::all_of<::std::is_convertible<RTypes, Elements>::value...>::value>::type* = nullptr>
   CAMP_HOST_DEVICE constexpr explicit tuple(tuple<RTypes...>&& rhs)
       : base(internal::expand_tag{}, rhs)
   {

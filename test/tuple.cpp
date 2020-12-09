@@ -163,3 +163,20 @@ TEST(CampTaggedTuple, MakeTagged)
   camp::get<s1>(t) = 15;
   ASSERT_EQ(camp::get<s1>(t), 15);
 }
+
+TEST(CampTuple, NestedTuplesMakeTuple1)
+{
+  auto nt1 = camp::make_tuple(1);
+  auto nt2 = camp::make_tuple('a');
+
+  camp::tuple<camp::tuple<int>> t(camp::make_tuple(1));
+  t = camp::make_tuple(nt1);
+
+}
+
+TEST(CampTuple, NestedTuplesMakeTuple2)
+{
+  auto t = camp::make_tuple(camp::make_tuple(1, 2), camp::make_tuple('a', 'b'));
+  auto t2 = t;
+
+}
