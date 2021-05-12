@@ -67,9 +67,9 @@ namespace resources
 
         return streams[num % 16];
       } 
-    private:
-      Hip(hipStream_t s) : stream(s) {}
+
     public:
+      Hip(hipStream_t s) : stream(s) {}
       Hip(int group = -1) : stream(get_a_stream(group)) {}
 
       // Methods
